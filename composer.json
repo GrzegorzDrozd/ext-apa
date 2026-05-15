@@ -1,0 +1,19 @@
+{
+    "name": "grzegorzdrozd/ext-apa",
+    "type": "php-ext",
+    "license": "MIT",
+    "description": "AfterParseAction - automatically call PHP code when attributes are detected during class loading",
+    "require": {
+        "php": "^8.2"
+    },
+    "php-ext": {
+        "extension-name": "apa",
+        "build-path": "ext",
+        "configure-options": [
+            {
+                "name": "enable-apa",
+                "description": "Enable AfterParseAction attribute support"
+            }
+        ]
+    }
+}

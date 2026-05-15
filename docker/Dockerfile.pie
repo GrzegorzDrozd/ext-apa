@@ -1,0 +1,31 @@
+FROM php:8.3-cli
+
+# Build dependencies
+RUN apt-get update && apt-get install -y \
+    autoconf gcc g++ make pkg-config \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install PIE
+RUN curl -fsSL https://github.com/php/pie/releases/latest/download/pie.phar -o /usr/local/bin/pie \
+    && chmod +x /usr/local/bin/pie
+
+# Copy clean extension source (filtered by .dockerignore)
+COPY . /opt/apa
+
+# Register local path and install via PIE
+RUN pie repository:add path /opt/apa \
+    && pie install grzegorzdrozd/ext-apa:@dev --no-interaction
+
+# Verify extension loads
+RUN php -m | grep apa
+RUN php -r "echo 'APA loaded: ' . (extension_loaded('apa') ? 'yes' : 'no') . PHP_EOL;"
+
+# Smoke test
+COPY ext/tests/bench_http/apa_controller.php /tmp/setup.php
+RUN echo '<?php' > /tmp/run.php && \
+    echo 'require "/tmp/setup.php";' >> /tmp/run.php && \
+    echo 'assert(count(AccessControl::$requirements) === 1);' >> /tmp/run.php && \
+    echo 'echo "PIE install test: PASS" . PHP_EOL;' >> /tmp/run.php
+RUN php /tmp/run.php
+
+CMD ["php", "-v"]

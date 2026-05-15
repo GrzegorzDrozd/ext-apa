@@ -1,0 +1,31 @@
+FROM debian:bookworm-slim
+WORKDIR /usr/src
+
+ENV PHPIZE_DEPS="autoconf dpkg-dev dpkg file g++ gcc libc-dev make pkgconf re2c"
+
+RUN apt-get update -y \
+  && apt-get install -y \
+    curl \
+    ${PHPIZE_DEPS} \
+    libxml2-dev \
+    libsqlite3-dev \
+    zlib1g-dev
+
+ARG PHP_VERSION
+ENV PHP_URL="https://www.php.net/distributions/php-${PHP_VERSION}.tar.xz"
+ENV TEST_PHP_ARGS="-q"
+
+RUN echo "$PHP_URL" \
+  && curl -fsSL -o php.tar.xz "$PHP_URL" \
+  && tar -xf php.tar.xz \
+  && rm php.tar.xz
+
+# Non-debug build with optimizations
+ARG PHP_CONFIG_OPTS="--with-pear --with-zlib"
+RUN cd php-${PHP_VERSION} \
+  && ./buildconf \
+  && ./configure ${PHP_CONFIG_OPTS} CFLAGS="-O2" \
+  && make -j $(nproc) \
+  && make install
+
+WORKDIR /usr/src/myapp

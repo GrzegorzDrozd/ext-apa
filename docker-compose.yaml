@@ -1,0 +1,26 @@
+services:
+  debian:
+    build:
+      context: docker
+      dockerfile: Dockerfile.debian
+      args:
+        PHP_VERSION: ${PHP_VERSION:-8.3.10}
+    volumes:
+      - ./ext:/usr/src/myapp
+      - ./symfony:/usr/src/myapp/symfony
+    environment:
+      TEST_PHP_ARGS: "-q"
+  release:
+    build:
+      context: docker
+      dockerfile: Dockerfile.release
+      args:
+        PHP_VERSION: ${PHP_VERSION:-8.3.10}
+    volumes:
+      - ./ext:/usr/src/myapp
+    environment:
+      TEST_PHP_ARGS: "-q"
+  pie:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.pie
