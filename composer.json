@@ -1,7 +1,7 @@
 {
     "name": "grzegorzdrozd/ext-apa",
     "type": "php-ext",
-    "license": "MIT",
+    "license": "AGPL-3.0 license",
     "description": "AfterParseAction - automatically call PHP code when attributes are detected during class loading",
     "require": {
         "php": "^8.2"
